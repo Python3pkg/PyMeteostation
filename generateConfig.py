@@ -1,6 +1,6 @@
 import json
 
-configBus = [
+configBus = [					# configuration of I2c bus
             	{"type": "i2chub",
              	 "address": 0x72,
              	 "children": 
@@ -20,9 +20,10 @@ deviceNameList = ["barometer","hum_temp"]    # list of sensor names
 translationConfig = [["wind_dir","",""],["wind_speed","",""],["wind_gust","",""],["temp","hum_temp","1"],["humidity","hum_temp","0"],
                     ["pressure","barometer","1"],["rain_1h","",""],["rain_24h","",""],["rain_today","",""],["snow","",""],
                     ["lum","",""],["lat","",""],["long","",""],["alt","",""],["radiation","",""],["dew_point","",""],
-                    ["uv","",""],["name","",""]]
+                    ["uv","",""],["name","",""]]	# assignment of sensor values to openweathermap.com value names
+                    					# example: [OWM.com name, sensor name, sensor value ID (only if sensor returns more than 1 value)]
 
-logFileName = "log.txt"
+logFileName = "log.txt"		# name of config file
 
 stationName = ""    # string
 latitude = 0        # float or False
