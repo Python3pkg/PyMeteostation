@@ -41,7 +41,7 @@ class Meteostation:
         if sensorName == "hum_temp":
             self.Devices[sensorName].route()
             return {"0":self.Devices[sensorName].get_hum(),"1":self.Devices[sensorName].get_temp()}
-        elif sensorName == "barometer":
+        elif sensorName == "barometer":     # returns atmospheric preassure readings corrected to sea level altitude.
             self.Devices[sensorName].route()
             data = self.Devices[sensorName].get_tp()
             return {"0":data[0],"1":data[1]/((1-((0.0065*self.altitude)/288.15))**5.255781292873008*100)}
