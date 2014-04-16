@@ -14,6 +14,7 @@ class Meteostation:
         self.stationName = JSONconfig["stationName"]
         self.latitude = JSONconfig["latitude"]
         self.longitude = JSONconfig["longitude"]
+        self.altitude = JSONconfig["altitude"]
 
         cfg = config.Config(i2c={"port":1}, bus=self.configBus)
         cfg.initialize()
@@ -43,7 +44,7 @@ class Meteostation:
         elif sensorName == "barometer":
             self.Devices[sensorName].route()
             data = self.Devices[sensorName].get_tp()
-            return {"0":data[0],"1":data[1]/100}
+            return {"0":data[0],"1":data[1]/((1-((0.0065*self.altitude)/288.15))**5.255781292873008*100)}
 
     def log(self,dataDict,logFileName=""):      # logging function
         if logFileName == "":
