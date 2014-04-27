@@ -1,5 +1,5 @@
 from pymlab import config
-import time, json, requests
+import time, json, requests, sys
 
 
 class Meteostation:
@@ -16,12 +16,15 @@ class Meteostation:
         self.longitude = JSONconfig["longitude"]
         self.altitude = JSONconfig["altitude"]
 
-        cfg = config.Config(i2c={"port":1}, bus=self.configBus)
-        cfg.initialize()
-
-        self.Devices = {}
-        for device in self.deviceNameList:
-            self.Devices[device] = cfg.get_device(device)
+        try:
+            cfg = config.Config(i2c={"port":1}, bus=self.configBus)
+            cfg.initialize()
+            
+            self.Devices = {}
+            for device in self.deviceNameList:
+                self.Devices[device] = cfg.get_device(device)
+        except:
+            sys.exit("Initialization of I2c failed")
 
         time.sleep(0.5)
 
@@ -37,14 +40,18 @@ class Meteostation:
 
         return outputList
 
-    def __getSensorData(self,sensorName):
-        if sensorName == "hum_temp":
-            self.Devices[sensorName].route()
-            return {"0":self.Devices[sensorName].get_hum(),"1":self.Devices[sensorName].get_temp()}
-        elif sensorName == "barometer":     # returns atmospheric preassure readings corrected to sea level altitude.
-            self.Devices[sensorName].route()
-            data = self.Devices[sensorName].get_tp()
-            return {"0":data[0],"1":data[1]/((1-((0.0065*self.altitude)/288.15))**5.255781292873008*100)}
+    def __getSensorData(self,sensorName):       # must return dict
+        try:
+            if sensorName == "hum_temp":
+                self.Devices[sensorName].route()
+                return {"0":self.Devices[sensorName].get_hum(),"1":self.Devices[sensorName].get_temp()}
+            elif sensorName == "barometer":     # returns atmospheric preassure readings corrected to sea level altitude.
+                self.Devices[sensorName].route()
+                data = self.Devices[sensorName].get_tp()
+                return {"0":data[0],"1":data[1]/((1-((0.0065*self.altitude)/288.15))**5.255781292873008*100)}
+        except:
+            print sensorName + " sensor read error"
+            return {"0":"error","1":"error"}
 
     def log(self,dataDict,logFileName=""):      # logging function
         if logFileName == "":
@@ -78,24 +85,33 @@ class Meteostation:
 
     def sendData(self,username,password,sendDict):      # sends data to openweathermap.com
         sendData = self.translateToPOST(sendDict)
-        result = requests.post("http://openweathermap.org/data/post",auth=(username,password),data=sendData)
-        JSONresult = result.json()
+        try:
+            result = requests.post("http://openweathermap.org/data/post",auth=(username,password),data=sendData)
+            JSONresult = result.json()
+        except:
+            JSONresult = {"message":"Network error","cod":"Network error","id":"0"}
+
         if JSONresult["cod"] == "200":
             return (True,JSONresult)
         else:
-            return  (False,JSONresult)
+            JSONresult["id"] = "0"
+            return (False,JSONresult)
 
     def translateToPOST(self,sendDict):    # translates sensor values to POST request format
         payload = {}
         for itemKey in sendDict.keys():
-            for transList in self.translationConfig:
-                if transList[2] == "" and itemKey == transList[1]:
-                    payload[transList[0]] = str(round(sendDict[itemKey],2))
-                elif not transList[2] == "" and itemKey == transList[1]:
-                    payload[transList[0]] = str(round(sendDict[itemKey][transList[2]],2))
-        if self.stationName:
+            if not itemKey == "time" and not sendDict[itemKey]["0"] == "error":
+                for transList in self.translationConfig:
+                    if transList[2] == "" and itemKey == transList[1]:
+                        payload[transList[0]] = str(round(sendDict[itemKey]["0"],2))
+                    elif not transList[2] == "" and itemKey == transList[1]:
+                        payload[transList[0]] = str(round(sendDict[itemKey][transList[2]],2))
+
+        if type(self.stationName) == str and len(self.stationName) > 0:
             payload["name"] = str(self.stationName)
-        if self.latitude and self.longitude:
+        if not type(self.latitude) == bool and not type(self.longitude) == bool:
             payload["lat"] = str(self.latitude)
             payload["long"] = str(self.longitude)
+        if not type(self.altitude) == bool:
+            payload["alt"] = str(self.altitude)
         return payload

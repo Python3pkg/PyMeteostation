@@ -22,12 +22,12 @@ translationConfig = [["wind_dir","",""],["wind_speed","",""],["wind_gust","",""]
                     ["lum","",""],["radiation","",""],["dew_point","",""],["uv","",""]]	# assignment of sensor values to openweathermap.com value names
                     					# example: [OWM.com name, sensor name, sensor value ID (only if sensor returns more than 1 value)]
 
-logFileName = "log.txt"		# name of config file
+logFileName = "log.txt"		# name of log file
 
 stationName = ""      # string or False
 latitude = 0.0        # float or False
 longitude = 0.0       # float or False
-altitude = 0.0        # float, must be filled if you use altimet01 sensor
+altitude = 0.0        # float or False, must be filled if you use altimet01 sensor
 
 with open("meteo.config","w") as f:
 	f.write(json.dumps({"configBus":configBus,"deviceNameList":deviceNameList,"translationConfig":translationConfig,"logFileName":logFileName,"stationName":stationName,"latitude":latitude,"longitude":longitude,"altitude":altitude}))
