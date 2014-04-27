@@ -107,7 +107,7 @@ class Meteostation:
                     elif not transList[2] == "" and itemKey == transList[1]:
                         payload[transList[0]] = str(round(sendDict[itemKey][transList[2]],2))
 
-        if type(self.stationName) == str and len(self.stationName) > 0:
+        if not type(self.stationName) == bool:
             payload["name"] = str(self.stationName)
         if not type(self.latitude) == bool and not type(self.longitude) == bool:
             payload["lat"] = str(self.latitude)
