@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 import json
-
-configBus = [					# configuration of I2c bus, supported sensor names: barometer, hum_temp
+writeDict = {}
+writeDict["busConfig"] = [					# configuration of I2c bus, supported sensor types: altimet01, sht25
             	{"type": "i2chub",
              	 "address": 0x72,
              	 "children": 
@@ -15,19 +16,27 @@ configBus = [					# configuration of I2c bus, supported sensor names: barometer,
             	}
         	]
 
-deviceNameList = ["barometer","hum_temp"]    # list of sensor names
+writeDict["translationConfig"] = [["wind_dir","",0],   # assignment of sensor values to openweathermap.com value names
+                                  ["wind_speed","",0], # example: [OWM.com name, sensor name, sensor value ID]
+                                  ["wind_gust","",0],
+                                  ["temp","hum_temp",1],
+                                  ["humidity","hum_temp",0],
+                                  ["pressure","barometer",1],
+                                  ["rain_1h","",0],
+                                  ["rain_24h","",0],
+                                  ["rain_today","",0],
+                                  ["snow","",0],
+                                  ["lum","",0],
+                                  ["radiation","",0],
+                                  ["dew_point","",0],
+                                  ["uv","",0]]	
 
-translationConfig = [["wind_dir","",""],["wind_speed","",""],["wind_gust","",""],["temp","hum_temp","1"],["humidity","hum_temp","0"],
-                    ["pressure","barometer","1"],["rain_1h","",""],["rain_24h","",""],["rain_today","",""],["snow","",""],
-                    ["lum","",""],["radiation","",""],["dew_point","",""],["uv","",""]]	# assignment of sensor values to openweathermap.com value names
-                    					# example: [OWM.com name, sensor name, sensor value ID (only if sensor returns more than 1 value)]
+writeDict["logPath"] = "logs/"		# path to directory where to save logs, string, fill or leave blank
 
-logFileName = "log.txt"		# name of log file
-
-stationName = ""      # string or False
-latitude = 0.0        # float or False
-longitude = 0.0       # float or False
-altitude = 0.0        # float or False, must be filled if you use altimet01 sensor
+writeDict["stationName"] = ""      # string or False
+writeDict["latitude"] = 0.0      # float or False
+writeDict["longitude"] = 0.0       # float or False
+writeDict["altitude"] = 0.0        # float or False, must be filled if you use altimet01 sensor
 
 with open("meteo.config","w") as f:
-	f.write(json.dumps({"configBus":configBus,"deviceNameList":deviceNameList,"translationConfig":translationConfig,"logFileName":logFileName,"stationName":stationName,"latitude":latitude,"longitude":longitude,"altitude":altitude}))
+	f.write(json.dumps(writeDict))

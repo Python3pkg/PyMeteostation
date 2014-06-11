@@ -1,9 +1,9 @@
 from meteoLib import *
 
 configFileName = "meteo.config"   # name of the generated config file
-delay = 600   # delay between uplading
-username = ""   # username for uploading meteo data
-password = ""   # password for uploading meteo data
+delay = 120   # delay between uplading (sec)
+username = ""   # OWM.com username for uploading meteo data
+password = ""   # OWM.com password for uploading meteo data
 
 m = Meteostation(configFileName)
 i = 0

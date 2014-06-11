@@ -10,7 +10,7 @@ MeteostationSW needs:
 * requests library (http://docs.python-requests.org)
 
 ### How to
-
+Create an account on http://openweathermap.org/ (login data are needed for sending weather data to OWM.com)  
 Into generateConfig.py insert required values (descripted in generateConfig.py) and run:
 
 ```
@@ -23,9 +23,9 @@ python generateConfig.py
 from meteoLib import *
 
 configFileName = "meteo.config"   # name of the generated config file
-delay = 600   # delay between uplading
-username = ""   # username for uploading meteo data
-password = ""   # password for uploading meteo data
+delay = 120   # delay between uplading (sec)
+username = ""   # OWM.com username for uploading meteo data
+password = ""   # OWM.com password for uploading meteo data
 
 m = Meteostation(configFileName)
 i = 0
