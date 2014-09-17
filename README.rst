@@ -109,3 +109,12 @@ How to
        pymeteostation start|stop|restart
 
    This will start PyMeteostation as service.
+
+Developmnet installation
+========================
+
+    git clone git@github.com:MLAB-project/PyMeteostation.git
+    cd PyMeteostation/
+    sudo python setup.py develop
+
+
