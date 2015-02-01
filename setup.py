@@ -11,7 +11,7 @@ setup(
     scripts=['bin/pymeteostation'],
     license='GNU General Public License v3 (GPLv3)',
     description='Software made for controlling meteostation built of MLAB electronic modules.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     install_requires=['pymlab >= 0.2'],
     keywords=['meteostation','MLAB','IIC','USB'],
     classifiers=["Programming Language :: Python",
