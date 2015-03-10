@@ -1,0 +1,335 @@
+WppppaN
+G00  15
+L    --
+B 12120
+WppppaY
+G00  13
+C  9687
+WppppaZ
+G00  13
+D 10166
+WppppaY
+G00  13
+A    65
+WpKppah
+G11  12
+L    --
+B 12120
+WpKppaY
+G11  13
+C  9686
+WpKppah
+G11  12
+D 10166
+Wppppah
+G00  12
+A    65
+WpKppaV
+G11  11
+Xp\ppaZ
+H12  13
+Yp\ppa\
+I12  14
+L    --
+B 12120
+WppppaY
+G00  13
+C  9687
+WppppaZ
+G00  13
+D 10166
+WpKppad
+G11  10
+A    66
+WpKppah
+G11  12
+L    --
+B 12120
+WppppaZ
+G00  13
+C  9686
+WppppaZ
+G00  13
+D 10166
+WpKppad
+G11  10
+A    66
+Wppppah
+G00  12
+L    --
+B 12120
+Wppppah
+G00  12
+Xp\ppaY
+H12  13
+Yp\ppa\
+I12  14
+C  9687
+WppppaY
+G00  13
+D 10166
+WpKppaY
+G11  13
+A    66
+WppppaK
+G00  14
+L    --
+B 12120
+WppppaV
+G00  11
+C  9687
+Wppppah
+G00  12
+D 10166
+WppppaZ
+G00  13
+A    66
+WppppaK
+G00  14
+L    --
+B 12120
+WpKppaK
+G11  14
+Xp\ppaY
+H12  13
+Yp\ppa\
+I12  14
+C  9687
+WppppaK
+G00  14
+D 10166
+WppppaN
+G00  15
+A    66
+WpKppa?
+G11  16
+L    --
+B 12120
+Wppppa?
+G00  16
+C  9687
+WpKppaN
+G11  15
+D 10166
+Wppppa?
+G00  16
+A    66
+Wppppbp
+G00  17
+L    --
+B 12120
+Wppppa?
+G00  16
+M   +13
+C  9687
+WpKppa?
+G11  16
+Xp\ppaZ
+H12  13
+Yp\ppa\
+I12  14
+D 10166
+Wppppbp
+G00  17
+A    66
+WpKppbb
+G11  17
+L    --
+B 12120
+Wppppa?
+G00  16
+C  9687
+WpKppaN
+G11  15
+D 10166
+Wp\ppa?
+G12  16
+A    66
+WppppaM
+G00  15
+L    --
+B 12120
+WpKppaM
+G11  15
+C  9687
+WpKppaN
+G11  15
+XpKppaZ
+H11  13
+Yp\ppa\
+I12  14
+D 10166
+WppppaK
+G00  14
+A    66
+WppppaV
+G00  11
+L    --
+B 12120
+WppppaV
+G00  11
+C  9687
+WppppaU
+G00  11
+D 10166
+Wppppah
+G00  12
+A    66
+Wppppad
+G00  10
+L    --
+B 12120
+Wppppah
+G00  12
+C  9687
+Wppppah
+G00  12
+D 10166
+WpKppah
+G11  12
+XpKppaZ
+H11  13
+Yp\ppa\
+I12  14
+A    66
+Wppppah
+G00  12
+L    --
+B 12120
+Wppppah
+G00  12
+C  9687
+Wppppah
+G00  12
+D 10166
+WppppaV
+G00  11
+A    66
+Wppppah
+G00  12
+L    --
+B 12120
+WpZppad
+G10  10
+C  9687
+WpZppaa
+G10  09
+D 10166
+Wppppab
+G00  09
+XpKppaZ
+H11  13
+Yp\ppa\
+I12  14
+A    66
+Wppppad
+G00  10
+L    --
+B 12120
+WpKppaV
+G11  11
+C  9687
+WpZppaY
+G10  13
+D 10166
+WpZppah
+G10  12
+A    66
+WppppaM
+G00  15
+L    --
+B 12120
+WppppaY
+G00  13
+C  9687
+WppppaZ
+G00  13
+D 10166
+WppppaY
+G00  13
+A    66
+WpZppaM
+G10  15
+XpKppaZ
+H11  13
+Yp\ppa\
+I12  14
+L    --
+B 12120
+WppppaM
+G00  15
+C  9687
+WpZppaM
+G10  15
+D 10166
+WpZppaN
+G10  15
+A    66
+WppppaN
+G00  15
+L    --
+B 12120
+WpZppaM
+G10  15
+C  9687
+WppppaM
+G00  15
+D 10166
+WppppaM
+G00  15
+A    66
+Wppppa?
+G00  16
+L    --
+B 12120
+WppppaN
+G00  15
+XpKppaZ
+H11  13
+Yp\ppa\
+I12  14
+C  9687
+Wppppbp
+G00  17
+D 10166
+WppppaK
+G00  14
+A    66
+WppppaK
+G00  14
+L    --
+B 12120
+WpZppaZ
+G10  13
+C  9687
+WppppaN
+G00  15
+D 10166
+WppppaN
+G00  15
+A    66
+WpZppaY
+G10  13
+L    --
+B 12120
+WpZppaM
+G10  15
+XpKppaZ
+H11  13
+Yp\ppa\
+I12  14
+M   +14
+C  9687
+WppppaK
+G00  14
+D 10166
+WppppaY
+G00  13
+A    66
+WpZppaZ
+G10  13
+L    --
+B 12120
+WppppaK
+G00  14
+C  9687
