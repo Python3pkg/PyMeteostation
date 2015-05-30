@@ -1,10 +1,15 @@
 #!/usr/bin/python
 
+import os
+import time
+import datetime
 import sys
 import serial
 
 sys.stdout.write("WS981 meteostation read software started.\n")
 
+path = "./data/"
+StationName = "LKSO-M1"
 
 try:
     ser = serial.Serial('/dev/ttyUSB0', 57600, timeout=1)
@@ -125,7 +130,20 @@ try:
                 wind_speed_kt = wind_speed_ms * 1.943844492
                 WAD_wind_10min = (wind_speed_ms, wind_speed_kt, wind_direction )
 
-            sys.stdout.write(" Temperature: %3.1f C\r\n" % (a))
+            now = datetime.datetime.now()
+            filename = path + time.strftime("%Y%m%d%H", time.gmtime())+"0000_"+StationName+"_freq.csv"
+            if not os.path.exists(filename):
+                with open(filename, "a") as f:
+                    f.write('#timestamp,Temperature,QFE,QNH,Wind_speed[m/s],Wind_direction \n')
+
+	    temp = a
+	    QFE = c
+	    QNH = d
+
+            with open(filename, "a") as f:
+                f.write("%.1f,%3.1f,%4.1f,%4.1f,%3.1f,%3.1f\n" % (time.time(), temp, QFE, QNH, WAD_wind[0], WAD_wind[2] ))
+
+            sys.stdout.write(" Temperature: %3.1f C\r\n" % (temp))
             sys.stdout.write(" Pressure: %3.1f hPa \r\n" % (b))
             sys.stdout.write(" QFE: %4.1f hPa\r\n" % (c))
             sys.stdout.write(" QNH: %4.1f hPa\r\n" % (d))
@@ -144,5 +162,6 @@ try:
 
 except KeyboardInterrupt:
     ser.close()
+    f.close()
     sys.exit(0)
 
