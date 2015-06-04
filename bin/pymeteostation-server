@@ -1,0 +1,112 @@
+#!/usr/bin/python
+from pymeteostation.server import *
+from pymeteostation import Daemon
+import ConfigParser, sys, os, time, json
+from multiprocessing import Process, Pipe
+import logging
+
+def measurementThread(args,data):
+	daemon = MeasurementDaemon('/tmp/pymeteostation-server-measure.pid')
+	if 'start' == args:
+		print "Starting pymeteostation measurement server"
+		daemon.start(data)
+	elif 'stop' == args:
+		print "Stopping pymeteostation measurement server"
+		daemon.stop()
+	elif 'restart' == args:
+		print "Restarting pymeteostation measurement server"
+		daemon.restart(data)
+
+
+def broadcastThread(args,data):
+	daemon = BroadcastDaemon('/tmp/pymeteostation-server-broadcast.pid')
+	if 'start' == args:
+		print "Starting pymeteostation broadcast server"
+		daemon.start(data)
+	elif 'stop' == args:
+		print "Stopping pymeteostation broadcast server"
+		daemon.stop()
+	elif 'restart' == args:
+		print "Restarting pymeteostation broadcast server"
+		daemon.restart(data)
+
+
+class MeasurementDaemon(Daemon):
+	def run(self,data_in):
+		try:
+			settings = getSettings(config_file)
+			m = Meteostation(settings)
+			while True:
+				data = m.getData()
+				data_in.send(data)
+				time.sleep(settings["measurement_interval"])
+		except Exception, e:
+			logging.error("MeasurementDaemon: "+str(e))
+
+class BroadcastDaemon(Daemon):
+	def run(self,data_out):
+		try:
+			settings = getSettings(config_file)
+			broadcaster = Broadcaster()
+			while True:
+				data = data_out.recv()
+				broadcaster.send(json.dumps(data, separators=(',', ':')))
+				time.sleep(settings["upload_interval"])
+		except Exception as e:
+			logging.error("BroadcastDaemon: "+str(e))
+
+
+def printHelp():
+	print "Usage: pymeteostation-server [arguments]"
+	print "Arguments:"
+	print " start|stop|restart:            Controlls pymeteostation."
+	print " -h or --help:                  Displays this message."
+	print " -g or --generate-config-file:  Generates new config file."
+
+def generateConfigFile():
+	parser = ConfigParser.SafeConfigParser()
+	parser.add_section("Meteostation")
+	for optionName in ["upload_interval","measurement_interval","station_id","latitude","longitude","altitude"]:
+		parser.set("Meteostation",optionName,"")
+
+	parser.add_section("I2C_Bus")
+	for optionName in ["port","devices"]:
+		parser.set("I2C_Bus",optionName,"")
+
+	try:
+		with open(config_file,"w") as f:
+			parser.write(f)
+	except Exception, e:
+		print "Cannot create config file: "+str(e)
+	else:
+		print "Done"
+
+
+
+#logging.basicConfig(filename='pymeteostation-server.log',level=logging.ERROR)
+if __name__ == "__main__":
+	config_file = os.path.expanduser("~")+"/.pymeteostation-server"
+	data_in, data_out = Pipe()
+	data_in.send([])
+
+	if len(sys.argv) >= 2:
+		if sys.argv[1] in ("start","stop","restart"):
+			Process(target=measurementThread,args=(sys.argv[1],data_in)).start()
+			Process(target=broadcastThread,args=(sys.argv[1],data_out)).start()
+
+		elif sys.argv[1] in ("-g","--generate-config-file"):
+			if os.path.exists(config_file):
+				usersDecision = raw_input("This action will overwrite existing configuration file. Continue? (y/n)  ")
+				if usersDecision == "y":
+					generateConfigFile()
+				else:
+					sys.exit()
+			else:
+				generateConfigFile()
+
+		else:
+			printHelp()
+		sys.exit()
+	else:
+		printHelp()
+		sys.exit()

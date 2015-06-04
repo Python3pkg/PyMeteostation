@@ -16,7 +16,7 @@ def getSettings(fileName):   # returns settings dictionary made of config file
 			raw_settings[section][option] = parser.get(section,option)
 
 	requiredSettings = {"Meteostation": ["username","password","uploadinterval","logpath"],
-					   "I2C_Device": [], "Translation_Into_POST": []}
+					   "I2C_Bus": [], "Translation_Into_POST": []}
 
 	for section in requiredSettings.keys():			# check if required sections and options are configured
 		if section in raw_settings.keys():
@@ -47,7 +47,7 @@ def getSettings(fileName):   # returns settings dictionary made of config file
 		except:
 			settings[option] = raw_settings["Meteostation"][option]
 	
-	settings["I2C_configuration"] = [getI2CConfig(raw_settings,"I2C_Device")]
+	settings["I2C_configuration"] = getI2CConfig(raw_settings,"I2C_Bus")
 	return settings
 """
 
@@ -109,13 +109,21 @@ def getSettings(fileName):   # returns settings dictionary made of config file
 	return settings
 """
 def getI2CConfig(settings,section): # recursively generates I2C configuration from configuration file
+	result = {"port": int(settings[section]["port"]), "bus": []}
+	devices = getOptionList(settings[section]["devices"])
+
+	for device in devices:
+		result["bus"].append(getDeviceConfig(settings,device))
+	return result
+
+def getDeviceConfig(settings,section):
 	result = {}
 	for option in settings[section].keys():
 		if option == "children":
 			children = getOptionList(settings[section][option])
 			result[option] = []
 			for child in children:
-				result[option].append(getI2CConfig(settings,child))
+				result[option].append(getDeviceConfig(settings,child))
 		elif option == "address":
 			result[option] = int(settings[section][option],base=16)
 		elif option == "channel":

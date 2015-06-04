@@ -1,3 +1,5 @@
+from time import sleep
+
 class Sensor:
 	def __init__(self,i2c_device,settings):
 		self.device = i2c_device
@@ -20,9 +22,22 @@ class altimet01(Sensor):
 
 class atmega(Sensor):
 	def _getData(self):
-		data = self.device.get()
-		while data[0] > 20:
-			data = self.device.get()
-		return [data[0]*45]
+		data = [0xFF,0xFF,0xFF]
+
+		self.device.put(0)					# start wind speed data measurement
+		sleep(1)
+		data[0] = self.device.get()/2.0 	# get measured values
+		
+		for i in range(3):
+			self.device.put(1)				# get wind direction data
+			result = self.device.get()*45
+			if result < 20:
+				data[1] = result*45
+				break
+
+		self.device.put(2)					# get rain data
+		data[2] = self.device.get()
+
+		return data
 
 sensor_classes = {"sht25":sht25, "altimet01": altimet01, "atmega": atmega}

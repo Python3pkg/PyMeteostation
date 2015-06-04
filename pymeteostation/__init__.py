@@ -1,5 +1,3 @@
-from meteostation import *
-from log import *
-from settings import *
-from upload import *
+import server
+import client
 from daemon import *

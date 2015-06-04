@@ -1,7 +1,6 @@
 from pymlab import config
 from sensors import *
 from time import time, sleep
-from sys import exit
 
 
 class Meteostation:
@@ -10,15 +9,15 @@ class Meteostation:
 		self.Devices = {}
 
 		try:
-			cfg = config.Config(i2c={"port":self.settings["I2C_configuration"][0]["port"]}, bus=self.settings["I2C_configuration"])
+			cfg = config.Config(i2c={"port":self.settings["I2C_configuration"]["port"]}, bus=self.settings["I2C_configuration"]["bus"])
 			cfg.initialize()
 
-			sensors = self.__getSensors(self.settings["I2C_configuration"])
+			sensors = self.__getSensors(self.settings["I2C_configuration"]["bus"])
 			for device in sensors.keys():
 				self.Devices[device] = sensor_classes[sensors[device]](cfg.get_device(device), self.settings)
 
 		except Exception, e:
-			exit("Initialization of I2c failed: "+str(e))
+			raise Exception("Initialization of I2c failed: "+str(e))
 
 		sleep(0.5)
 

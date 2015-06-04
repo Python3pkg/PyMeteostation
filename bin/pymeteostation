@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from pymeteostation.server import *
 from pymeteostation import *
 import ConfigParser, sys, os, time
 
@@ -55,15 +56,20 @@ if __name__ == "__main__":
 			daemon.restart()
 
 		elif sys.argv[1] in ("-n","--no-service"):
-			print "Pymeteostation"
-			settings = getSettings(os.path.expanduser("~")+"/.pymeteostation")
-			m = Meteostation(settings)
-			while True:
-				data = m.getData()
-				result = uploadToOWM(data,settings)
-				makeLog(dict(data.items() + result[1].items()),settings)
-				print "["+time.strftime("%H:%M:%S", time.gmtime())+"] "+str(data)+" || result: "+str(result[1]["cod"])+" stationID: "+str(result[1]["id"])
-				time.sleep(settings["uploadinterval"])
+			try:
+				print "Pymeteostation"
+				settings = getSettings(os.path.expanduser("~")+"/.pymeteostation")
+				m = Meteostation(settings)
+				while True:
+					data = m.getData()
+					#result = uploadToOWM(data,settings)
+					#makeLog(dict(data.items() + result[1].items()),settings)
+					print "["+time.strftime("%H:%M:%S", time.gmtime())+"] "+str(data)
+					"""+" || result: "+str(result[1]["cod"])+" stationID: "+str(result[1]["id"])"""
+					time.sleep(settings["uploadinterval"])
+			except KeyboardInterrupt:
+				sys.exit()
+
 
 		elif sys.argv[1] in ("-g","--generate-config-file"):
 			if os.path.exists(os.path.expanduser("~")+"/.pymeteostation"):
