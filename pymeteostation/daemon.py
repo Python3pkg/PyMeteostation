@@ -64,7 +64,7 @@ class Daemon:
 	def delpid(self):
 		os.remove(self.pidfile)
 
-	def start(self):
+	def start(self,*args):
 		"""
 		Start the daemon
 		"""
@@ -83,7 +83,7 @@ class Daemon:
 		
 		# Start the daemon
 		self.daemonize()
-		self.run()
+		self.run(*args)
 
 	def stop(self):
 		"""
@@ -116,14 +116,14 @@ class Daemon:
 				print str(err)
 				sys.exit(1)
 
-	def restart(self):
+	def restart(self,*args):
 		"""
 		Restart the daemon
 		"""
 		self.stop()
-		self.start()
+		self.start(*args)
 
-	def run(self):
+	def run(self,*args):
 		"""
 		You should override this method when you subclass Daemon. It will be called after the process has been
 		daemonized by start() or restart().

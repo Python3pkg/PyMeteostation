@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from distutils.core import setup
+from setuptools import setup, find_packages
+import sys
+import os
+import os.path as path
 
 setup(
     name='PyMeteostation',
@@ -8,10 +11,10 @@ setup(
     author_email='micek.luki@seznam.cz',
     url='https://github.com/MLAB-project/PyMeteostation',
     packages=['pymeteostation'],
-    scripts=['bin/pymeteostation'],
+    scripts=['bin/pymeteostation','bin/pymeteostation-server','bin/pymeteostation-client'],
     license='GNU General Public License v3 (GPLv3)',
     description='Software made for controlling meteostation built of MLAB electronic modules.',
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     install_requires=['pymlab >= 0.2'],
     keywords=['meteostation','MLAB','IIC','USB'],
     classifiers=["Programming Language :: Python",

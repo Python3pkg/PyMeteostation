@@ -1,0 +1,107 @@
+#!/usr/bin/python
+#
+# Simple server that broadcasts the measured data.
+#
+
+from pymeteostation import *
+import sys, os, time, json
+from multiprocessing import Process, Pipe
+import logging
+
+def measurementThread(args,data):
+	daemon = MeasurementDaemon('/tmp/pymeteostation-server-measure.pid')
+	if 'start' == args:
+		print "Starting pymeteostation measurement server"
+		daemon.start(data)
+	elif 'stop' == args:
+		print "Stopping pymeteostation measurement server"
+		daemon.stop()
+	elif 'restart' == args:
+		print "Restarting pymeteostation measurement server"
+		daemon.restart(data)
+
+
+def broadcastThread(args,data):
+	daemon = BroadcastDaemon('/tmp/pymeteostation-server-broadcast.pid')
+	if 'start' == args:
+		print "Starting pymeteostation broadcast server"
+		daemon.start(data)
+	elif 'stop' == args:
+		print "Stopping pymeteostation broadcast server"
+		daemon.stop()
+	elif 'restart' == args:
+		print "Restarting pymeteostation broadcast server"
+		daemon.restart(data)
+
+
+class MeasurementDaemon(Daemon):
+	def run(self,data_in):
+		try:
+			settings = getSettings(config_file)
+			m = Meteostation(settings)
+			while True:
+				data = m.getData()
+				data_in.send(data)
+				time.sleep(int(settings["Meteostation"]["measurement_interval"]))
+		except Exception, e:
+			logging.error("MeasurementDaemon: "+str(e))
+
+class BroadcastDaemon(Daemon):
+	def run(self,data_out):
+		try:
+			settings = getSettings(config_file)
+			broadcaster = Broadcaster()
+			while data_out.recv() == []: pass
+			while True:
+				data = data_out.recv()
+				broadcaster.send(json.dumps(data, separators=(',', ':')))
+				time.sleep(int(settings["Meteostation"]["upload_interval"]))
+		except Exception as e:
+			logging.error("BroadcastDaemon: "+str(e))
+
+
+def printHelp():
+	print "Usage: pymeteostation-server [arguments]"
+	print "Arguments:"
+	print " start|stop|restart:            Controlls pymeteostation."
+	print " -h or --help:                  Displays this message."
+	print " -g or --generate-config-file:  Generates new config file."
+
+if __name__ == "__main__":
+	config_file = os.path.expanduser("~")+"/.pymeteostation-server"
+	settings = getSettings(config_file)
+
+	level = logging.CRITICAL
+	if "debug" in settings["Meteostation"]:
+		if settings["Meteostation"]["debug"].lower() in level:
+			level = levels[settings["Meteostation"]["debug"].lower()]
+
+	log_path = os.path.expanduser("~")+"/pymeteostation-server.log"
+	if "log_path" in settings["Meteostation"]:
+			log_path = os.path.abspath(settings["Meteostation"]["log_path"]) + "/pymeteostation-server.log"
+
+	logging.basicConfig(filename=log_path,level=level)
+
+	if len(sys.argv) >= 2:
+		if sys.argv[1] in ("start","stop","restart"):
+			data_in, data_out = Pipe()
+			data_in.send([])
+			Process(target=measurementThread,args=(sys.argv[1],data_in)).start()
+			Process(target=broadcastThread,args=(sys.argv[1],data_out)).start()
+
+		elif sys.argv[1] in ("-g","--generate-config-file"):
+			if os.path.exists(config_file):
+				usersDecision = raw_input("This action will overwrite existing configuration file. Continue? (y/n)  ")
+				if usersDecision == "y":
+					generateConfigFile()
+				else:
+					sys.exit()
+			else:
+				generateConfigFile()
+
+		else:
+			printHelp()
+		sys.exit()
+	else:
+		printHelp()
+		sys.exit()

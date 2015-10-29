@@ -2,7 +2,7 @@
 PyMeteostation
 ==============
 
-Pymeteostation is software made for controlling meteostation built of MLAB electronic modules (http://www.mlab.cz/) and sending measurements to Open Weather Map (http://openweathermap.org/).
+PyMeteostation is software made for controlling meteostation built of MLAB electronic modules (http://www.mlab.cz/).
 
 Currently supported sensors are:
 
@@ -19,93 +19,84 @@ How to
 
 1. Install PyMeteostation::
     
-    pip install PyMeteostation
+    python setup.py install
 
-2. Create an account on http://openweathermap.org/
+2. Install the AWS02A weewx driver:
+    
+    Copy the aws02a.py driver into your weewx instalation
+    
+    ::
 
-3. Run::
+        cp weewx_driver/aws02a.py /home/weewx/bin/weewx/driver/
 
-    pymeteostation -g
+3. Set AWS02A in weewx configuration file:
 
-   This wil generate basic configuration file named .pymeteostation in your home directory.
+   * *[Station]* section:
 
-4. Fill the generated config file:
-
-   * *[Meteostation]* section:
-
-     Requiered options: *username*, *password*, *uploadinterval* (in seconds) and *logpath* (must be absolute path)
-
-     If you use ALTIMET01A sensor you must fill *altitude* option too. (It is used for correcting pressure to sea level altitude.)
-
-   * *[I2C_Device]* section:
-
-     Enter I2C configuration. (example options: *type*, *name*, *address*, *channel*, *children*...)
-
-     Usage of *children* option::
-
-         children = sensor1;sensor2;
-
-     The names in *children* option are names of sections defining the children devices.
-
-     Sensors must have *name* option filled.
-
-     Currently supported device types: *i2chub*, *sht25*, *altimet01*
-
-   * *[Translation_Into_POST]* section:
+      station_type = AWS02A
      
-     Into option, which you want to send, fill sensor name, from which will be gathered data, and sensor measurement ID (this is because some sensors return more than one measurement).
+   * *[AWS02A]* section:
+      
+      driver = weewx.drivers.aws02a
+
+   * *[[I2C_Bus]]* section:
+
+      Enter I2C configuration. (example options: *type*, *address*, *channel*...)
+
+      Section names must be unique.
+
+   * *[[Sensor_mapping]]* section:
+     
+      Into option, which you want to send, fill sensor name, from which will be gathered data, and sensor measurement ID.
+
+     See example for more information.
+
+4. Start weewx
+
 
    **Example**::
   
-       [Meteostation]
-       username = user
-       password = XXXXXX
-       uploadinterval = 120
-       logpath = /home/user/PyMeteostation-logs/
-       stationname = Meteostation 01
-       latitude = 0.0
-       longtitude = 0.0
-       altitude = 0.0
+      [Station]
 
-       [I2C_Device]
-       type = i2chub
-       address = 0x72
-       children = barometer;hum_temp;
+          # Description of the station location
+          location = Testovaci stanice Svakov
 
-       [barometer]
-       name = barometer
-       type = altimet01
-       channel = 0
+          # Latitude and longitude in decimal degrees
+          latitude = 90.000
+          longitude = 0.000
 
-       [hum_temp]
-       name = hum_temp
-       type = sht25
-       channel = 1
+          # Altitude of the station, with unit it is in. This is downloaded from
+          # from the station if the hardware supports it.
+          altitude = 412, meter    # Choose 'foot' or 'meter' for unit
 
-       [Translation_Into_POST]
-       wind_dir = 
-       wind_speed = 
-       wind_gust = 
-       temp = hum_temp;1;
-       humidity = hum_temp;0;
-       pressure = barometer;1;
-       rain_1h = 
-       rain_24h = 
-       rain_today = 
-       snow = 
-       lum = 
-       radiation = 
-       dew_point = 
-       uv = 
+          # Set to type of station hardware. There must be a corresponding stanza
+          # in this file with a 'driver' parameter indicating the driver to be used.
+          station_type = AWS01A
 
-5. (optional) I recommend to run::
+          # If you have a website, you may specify an URL
+          #station_url = http://www.example.com
 
-       pymetostation -n
+          # The start of the rain year (1=January; 10=October, etc.). This is
+          # downloaded from the station if the hardware supports it.
+          rain_year_start = 1
 
-   This will run PyMeteostation not as service, so you can check if are there any errors.
+          week_start = 6
 
-6. Run::
+      ##############################################################################
 
-       pymeteostation start|stop|restart
+      [AWS01A]
+          driver = weewx.drivers.aws02a
 
-   This will start PyMeteostation as service.
+          [[I2C_Bus]]
+              port = 1
+              [[[barometer]]]
+                  type = altimet01
+                  address = 0x60
+              [[[hum_temp]]]
+                  type = sht25
+                  address = 0x40
+
+          [[Sensor_mapping]]
+              outTemp = barometer, 0
+              pressure = barometer, 1
+              outHumidity = hum_temp, 0

@@ -1,0 +1,18 @@
+#!/usr/bin/python
+#
+# Simple client app for PyMeteostation
+#
+# Receive UDP packets transmitted by a broadcasting service
+
+MYPORT = 50000
+
+import sys, json
+from socket import *
+
+s = socket(AF_INET, SOCK_DGRAM)
+s.bind(('', MYPORT))
+
+while 1:
+	data, wherefrom = s.recvfrom(4096)
+	print wherefrom
+	print json.loads(data)
