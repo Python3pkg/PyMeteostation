@@ -1,5 +1,5 @@
 from pymlab import config
-import time, json, urllib, urllib2, sys, os, ast, ConfigParser, base64
+import time, json, urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, sys, os, ast, configparser, base64
 
 
 class Meteostation:
@@ -15,7 +15,7 @@ class Meteostation:
             self.Devices = {}
             for device in self.__getNames(self.settings["I2C_configuration"]):
                 self.Devices[device] = cfg.get_device(device)
-        except Exception, e:
+        except Exception as e:
             sys.exit("Initialization of I2c failed: "+str(e))
 
         time.sleep(0.5)
@@ -24,7 +24,7 @@ class Meteostation:
         outputList = {}
         outputList["time"] = int(time.time())
         if requestList == "all":
-            for device in self.Devices.keys():
+            for device in list(self.Devices.keys()):
                 outputList[device] = self.__getSensorData(device,self.NameTypeDict[device])
         else:
             for request in requestList:
@@ -41,8 +41,8 @@ class Meteostation:
                 self.Devices[sensorName].route()
                 data = self.Devices[sensorName].get_tp()
                 return [data[0],data[1]/((1-((0.0065*self.settings["altitude"])/288.15))**5.255781292873008*100)]
-        except Exception, e:
-            print sensorName + " sensor error:",str(e)
+        except Exception as e:
+            print(sensorName + " sensor error:",str(e))
             return ["error",str(e)]
 
     def log(self,dataDict,logFileName=""):      # logging function
@@ -60,8 +60,8 @@ class Meteostation:
             with open(FULLlogFileName,"w") as f:
                 savedData.append(dataDict)
                 f.write(json.dumps(savedData))
-        except Exception, e:
-            print "Logging failed:", str(e)
+        except Exception as e:
+            print("Logging failed:", str(e))
             
     def __generateLogFile(self,logFileName,logPath):      # generator of a log file
         defaultLog = []
@@ -71,17 +71,17 @@ class Meteostation:
 
             with open(logPath+logFileName,"w") as f:
                 f.write(json.dumps(defaultLog))
-        except Exception, e:
-            print "Cannot generate log file:",str(e)
+        except Exception as e:
+            print("Cannot generate log file:",str(e))
 
     def sendData(self,username,password,sendDict):      # sends data to openweathermap.com
         sendData = self.translateToPOST(sendDict)
         url = "http://openweathermap.org/data/post"
 
-        request = urllib2.Request(url,data=urllib.urlencode(sendData),headers={"Authorization":"Basic "+base64.encodestring(username+":"+password)[:-1]})
+        request = urllib.request.Request(url,data=urllib.parse.urlencode(sendData),headers={"Authorization":"Basic "+base64.encodestring(username+":"+password)[:-1]})
         try:
-            result = urllib2.urlopen(request)
-        except urllib2.URLError as e:
+            result = urllib.request.urlopen(request)
+        except urllib.error.URLError as e:
             if hasattr(e, "code"):
                 return (False, {"message":e.reason,"cod":e.code,"id":"0"})
             else:
@@ -97,7 +97,7 @@ class Meteostation:
 
     def translateToPOST(self,sendDict):    # translates sensor values to POST request format
         payload = {}
-        for itemKey in sendDict.keys():
+        for itemKey in list(sendDict.keys()):
             if not itemKey == "time" and not sendDict[itemKey][0] == "error":
                 for transList in self.settings["Translation_Into_POST"]:
                     if itemKey == transList[1]:
@@ -115,7 +115,7 @@ class Meteostation:
     def __getNames(self,busConfig):  # recursively searches for all "name" dictionary keys and returns their values: ["name1", "name2", ...]
         names = []
         for item in busConfig:
-            for key in item.keys():
+            for key in list(item.keys()):
                 if key == "name":
                     names.append(item[key])
                 if type(item[key]) == list:
@@ -125,18 +125,18 @@ class Meteostation:
     def __getTypes(self,busConfig):  # recursively searches for all "name" and "type" dictionary keys and return their values: {name:type, ...}
         names = {}
         for item in busConfig:
-            for key in item.keys():
+            for key in list(item.keys()):
                 if key == "name":
                     names[item[key]] = item["type"]
                 if type(item[key]) == list:
-                    names = dict(names.items() + self.__getTypes(item[key]).items())
+                    names = dict(list(names.items()) + list(self.__getTypes(item[key]).items()))
         return names
 
     def __getSettings(self,fileName):   # returns settings dictionary made of config file
-        parser = ConfigParser.SafeConfigParser()
+        parser = configparser.SafeConfigParser()
         try:
             parser.read(fileName)
-        except Exception, e:
+        except Exception as e:
             sys.exit("Unable to load configuration file. Error: "+str(e))
 
         options = {}
@@ -186,13 +186,13 @@ class Meteostation:
                     try:
                         translationListPart = self.__getOptionList(parser.get("Translation_Into_POST",option))
                         if len(translationListPart) != 2:
-                            print "Strange value set to option \'%s\'. Using default value." % (option)
+                            print("Strange value set to option \'%s\'. Using default value." % (option))
                             translationListPart = ['',0]
                     except:
-                        print "Strange value set to option \'%s\'. Using default value." % (option)
+                        print("Strange value set to option \'%s\'. Using default value." % (option))
                         translationListPart = ['',0]
                 settings["Translation_Into_POST"].append([option,translationListPart[0],int(translationListPart[1])])
-        except Exception, e:
+        except Exception as e:
             sys.exit("Bad format of configuration file. Error: "+str(e))
         return settings
 

@@ -1,5 +1,5 @@
 from pymlab import config
-from sensors import *
+from .sensors import *
 from time import time, sleep
 import configobj
 
@@ -12,7 +12,7 @@ class Meteostation:
 		cfg = config.Config(i2c={"port":self.settings["I2C_Bus"]["port"]}, bus=self.settings["I2C_Bus"]["children"])
 		cfg.initialize()
 
-		for device_name, device_type in self.__getSensors(self.settings["I2C_Bus"]["children"]).items():
+		for device_name, device_type in list(self.__getSensors(self.settings["I2C_Bus"]["children"]).items()):
 			if device_type in sensor_classes:
 				self.Devices[device_name] = sensor_classes[device_type](cfg.get_device(device_name), self.settings)
 
@@ -23,7 +23,7 @@ class Meteostation:
 		outputList["time"] = int(time())
 		
 		if requestList == "all":
-			requestList = self.Devices.keys()
+			requestList = list(self.Devices.keys())
 
 		for device in requestList:
 			outputList[device] = self.Devices[device]._getData()
@@ -36,7 +36,7 @@ class Meteostation:
 			if "name" in device and "type" in device:
 				names[device["name"]] = device["type"]
 			if "children" in device:
-				names = dict(names.items() + self.__getSensors(device["children"]).items())
+				names = dict(list(names.items()) + list(self.__getSensors(device["children"]).items()))
 		return names
 
 def get_I2C_configuration(i2c_bus):
